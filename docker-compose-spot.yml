@@ -18,12 +18,11 @@ services:
     # Please read the https://www.freqtrade.io/en/stable/rest-api/ documentation
     # before enabling this.
     ports:
-      - "8080:8080"
+      - "8081:8080"
     # Default command used when running `docker compose up`
     command: >
       trade
       --logfile /freqtrade/user_data/logs/freqtrade.log
-      --db-url sqlite:////freqtrade/user_data/db/equeum.futures.dry.sqlite
-      --config /freqtrade/user_data/config.equeum.futures.json
+      --db-url sqlite:////freqtrade/user_data/db/equeum.spot.dry.sqlite
+      --config /freqtrade/user_data/config.equeum.spot.json
       --strategy EqueumStrategy
- g

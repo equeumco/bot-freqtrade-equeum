@@ -21,14 +21,11 @@ logger = logging.getLogger(__name__)
 class EqueumStrategy(IStrategy):
     INTERFACE_VERSION = 3
 
-    # Can this strategy go short?
-    can_short: bool = True
-
     # disable ROI
     minimal_roi = {
         "0": 100
     }
-
+    
     # disable stop loss, right?
     stoploss = -1
     trailing_stop = False
@@ -40,13 +37,15 @@ class EqueumStrategy(IStrategy):
     process_only_new_candles = True
 
     use_exit_signal = True
-    exit_profit_only = False
-    ignore_roi_if_entry_signal = False
-
+    
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
     
     equeum_data = {}
+    
+    equem_ticker_map = {
+        "1000SHIB": "SHIB"
+    }
 
     plot_config = {
         "main_plot": {},
@@ -67,8 +66,21 @@ class EqueumStrategy(IStrategy):
             }
         }
     }
+    
+    def bot_loop_start(self):
+        # Can this strategy go short?
+        self.can_short = self.config['equeum']['enable_short']
+
+    def map_equeum_ticker(self, ft_ticker):
+        if ft_ticker in self.equem_ticker_map:
+            return self.equem_ticker_map[ft_ticker]
+        
+        return ft_ticker
 
     def populate_equeum_data(self, df: DataFrame, ticker) -> DataFrame:
+        # update ticker
+        ticker = self.map_equeum_ticker(ticker)
+        
         # request data to API
         params = {
             "ticker": ticker,
