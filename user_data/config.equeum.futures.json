@@ -90,7 +90,7 @@
     ],
 
     "equeum": {
-        "api_token": "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2",
+        "api_token": "DI5-8eSrT_y9NW33vf6i-sW2hDv0m7G0wjbS4WF_ggHjD",
         "api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
         "enable_long": true,
         "enable_short": true

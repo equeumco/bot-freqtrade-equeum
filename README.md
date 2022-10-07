@@ -2,7 +2,17 @@
 
 Freqtrade bot, utilizing equeum API.
 
-# How to run the bot with Docker:
+# Setting up the bot
+
+Byt default this bot in the repository is configured to run in the [dry mode](https://www.freqtrade.io/en/stable/configuration/#considerations-for-dry-run) and trade all available pairs to demonstrate you capabilities of the data equeum provides.
+
+To switch to production mode please carefully read [this part of documentation](https://www.freqtrade.io/en/stable/configuration/#switch-to-production-mode) and setup exchange and tokens you want to trade.
+
+Also don't forget to put the right `API Token` from [eqeueum app](https://app.equeum.com/app) to the configuration file at section `eqeueum.api_token`.
+
+
+
+# Running bot with Docker:
 
 1. Make sure you have Docker installed and running (https://www.docker.com/)
 2. Open Shell/terminal/cmd and `cd` to repo folder
@@ -12,7 +22,12 @@ Freqtrade bot, utilizing equeum API.
 	- `docker compose -f docker-compose-spot.yml up -d` - to run spot setup
 	- `docker compose -f docker-compose-benchmark.yml up -d` - to run both futures and spot together
 
+Thats all all, now the bot is running and you can [access it](#how-to-access-the-bot).
+
+# Running bot on host machine
+
 # How to access the bot:
+
 By default spot & futures bots are running on different ports:
 - futures - http://localhost:8080
 - spot - http://localhost:8081
@@ -21,20 +36,20 @@ For benchmark you can access any of them and configure both bots in one UI
 
 # How to add equium to existing strategy:
 
-add this to your configuration file:
-```
+Add this into your configuration file:
+```json
 
     "equeum": {
-        "api_token": "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2",
+        "api_token": "PUT YOUR TOKEN HERE",
         "api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
         "enable_long": true,
-        "enable_short": false
+        "enable_short": true
     },
 ```
 
-add this to your stategy:
+And this to your stategy file:
 
-```
+```py
 	equeum_data = {}
     
     equem_ticker_map = {
@@ -79,15 +94,15 @@ add this to your stategy:
 
 ```
 
-add this line to your `populate_indicators`:
+Now it's tome to update `populate_indicators`:
 
-```
+```py
 self.populate_equeum_data(df, ticker)
 ```
 
-And finally modify your entry/exit signals:
+And finally modify entry/exit signals based on equeum data:
 
-```
+```py
     def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
         df.loc[
             (

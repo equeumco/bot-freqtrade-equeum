@@ -26,7 +26,7 @@ class EqueumStrategy(IStrategy):
         "0": 100
     }
     
-    # disable stop loss, right?
+    # disable stop loss
     stoploss = -1
     trailing_stop = False
 
