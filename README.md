@@ -26,6 +26,28 @@ Thats all all, now the bot is running and you can [access it](#how-to-access-the
 
 # Running bot on host machine
 
+If you want to run the bot on your host machine, consider to follow installation guide for [*nix platforms](https://www.freqtrade.io/en/stable/installation/) and [windows](https://www.freqtrade.io/en/stable/windows_installation).
+
+Then merge the `user_data` folder from this repository into the folder, you've creted during the installation.
+
+To start the bot on futures run this in terminal:
+```sh
+freqtrade trade
+    --logfile /freqtrade/user_data/logs/freqtrade.futures.log \
+    --db-url sqlite:////freqtrade/user_data/db/equeum.futures.dry.sqlite \
+    --config /freqtrade/user_data/config.equeum.futures.json \
+    --strategy EqueumStrategy
+```
+
+To start on the spot:
+```sh
+freqtrade trade
+    --logfile /freqtrade/user_data/logs/freqtrade.spot.log \
+    --db-url sqlite:////freqtrade/user_data/db/equeum.spot.dry.sqlite \
+    --config /freqtrade/user_data/config.equeum.spot.json \
+    --strategy EqueumStrategy
+```
+
 # How to access the bot:
 
 By default spot & futures bots are running on different ports:
@@ -50,8 +72,8 @@ Add this into your configuration file:
 And this to your stategy file:
 
 ```py
-    equeum_data = {}
-
+	equeum_data = {}
+    
     equem_ticker_map = {
         "1000SHIB": "SHIB"
     }
