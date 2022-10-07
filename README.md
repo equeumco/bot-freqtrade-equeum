@@ -50,11 +50,11 @@ Add this into your configuration file:
 And this to your stategy file:
 
 ```py
-	equeum_data = {}
+    equeum_data = {}
 
-	equem_ticker_map = {
-		"1000SHIB": "SHIB"
-	}
+    equem_ticker_map = {
+        "1000SHIB": "SHIB"
+    }
 	
     def map_equeum_ticker(self, ft_ticker):
         if ft_ticker in self.equem_ticker_map:
