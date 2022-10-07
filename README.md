@@ -54,7 +54,8 @@ By default spot & futures bots are running on different ports:
 - futures - http://localhost:8080
 - spot - http://localhost:8081
 
-For benchmark you can access any of them and configure both bots in one UI
+For benchmark you can access any of them and configure both bots in one UI.
+It is strongly recommended to read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
 
 # How to add equium to existing strategy:
 

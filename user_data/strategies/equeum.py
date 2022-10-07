@@ -80,34 +80,43 @@ class EqueumStrategy(IStrategy):
     def populate_equeum_data(self, df: DataFrame, ticker) -> DataFrame:
         # update ticker
         ticker = self.map_equeum_ticker(ticker)
-        
+
         # request data to API
         params = {
             "ticker": ticker,
             "token": self.config['equeum']['api_token']
         }
-        # logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
-        
+        logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
+
         res = requests.get(self.config['equeum']['api_endpoint'], params)
         eq_data = res.json()
         
+        # validate the response
+        if 'trendline' not in eq_data:
+            logger.warning('Provided equeum API is wrong! Please double check your config.')
+            # mock the response
+            df.at[df.index[-1], 'equeum_trendline'] = 'unknown'
+            df.at[df.index[-1], 'equeum_duration'] = ''
+            df.at[df.index[-1], 'equeum_value'] = 0
+            return df
+
         if not ticker in self.equeum_data:
             self.equeum_data[ticker] = []
-        
+
         # store it localy in memory
         self.equeum_data[ticker].append(eq_data)
-        
-        # logger.info(f"equeum: response: {eq_data}")
-        
+
+        logger.info(f"equeum: response: {eq_data}")
+
         # store only last 999 or less data points, since dataframe is always 999 candles
         self.equeum_data[ticker] = self.equeum_data[ticker][-df.shape[0]:]
         
         # merge equeum data into dataframe
         for index, item in enumerate(reversed(self.equeum_data[ticker])):
-            df.at[df.index[-(index+1)], 'equeum_trendline'] = item['trendline']
-            df.at[df.index[-(index+1)], 'equeum_duration'] = item['duration']
-            df.at[df.index[-(index+1)], 'equeum_value'] = item['value']
-            
+            df.at[df.index[-(index + 1)], 'equeum_trendline'] = item['trendline']
+            df.at[df.index[-(index + 1)], 'equeum_duration'] = item['duration']
+            df.at[df.index[-(index + 1)], 'equeum_value'] = item['value']
+
         return df
         
         
