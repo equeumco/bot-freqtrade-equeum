@@ -51,9 +51,9 @@ And this to your stategy file:
 
 ```py
 	equeum_data = {}
-    
+
 	equem_ticker_map = {
-	"1000SHIB": "SHIB"
+		"1000SHIB": "SHIB"
 	}
 	
     def map_equeum_ticker(self, ft_ticker):
