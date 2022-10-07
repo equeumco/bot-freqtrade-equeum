@@ -86,7 +86,7 @@ class EqueumStrategy(IStrategy):
             "ticker": ticker,
             "token": self.config['equeum']['api_token']
         }
-        logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
+        # logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
 
         res = requests.get(self.config['equeum']['api_endpoint'], params)
         eq_data = res.json()
@@ -106,7 +106,7 @@ class EqueumStrategy(IStrategy):
         # store it localy in memory
         self.equeum_data[ticker].append(eq_data)
 
-        logger.info(f"equeum: response: {eq_data}")
+        # logger.info(f"equeum: response: {eq_data}")
 
         # store only last 999 or less data points, since dataframe is always 999 candles
         self.equeum_data[ticker] = self.equeum_data[ticker][-df.shape[0]:]
