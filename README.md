@@ -56,7 +56,7 @@ And this to your stategy file:
         "1000SHIB": "SHIB"
     }
 	
-	def map_equeum_ticker(self, ft_ticker):
+    def map_equeum_ticker(self, ft_ticker):
         if ft_ticker in self.equem_ticker_map:
             return self.equem_ticker_map[ft_ticker]
         
