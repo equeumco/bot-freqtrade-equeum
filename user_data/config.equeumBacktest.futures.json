@@ -1,7 +1,7 @@
 {
     "max_open_trades": 1,
     "stake_currency": "USDT",
-    "stake_amount": "unlimited",
+    "stake_amount": 100,
     "tradable_balance_ratio": 1,
     "fiat_display_currency": "USD",
     "timeframe": "1m",
@@ -20,8 +20,8 @@
         "unit": "minutes"
     },
     "order_types": {
-        "entry": "limit",
-        "exit": "limit",
+        "entry": "market",
+        "exit": "market",
         "emergency_exit": "market",
         "force_exit": "market",
         "force_entry": "market",
@@ -68,7 +68,8 @@
 
     "equeum": {
         "api_token": "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2",
-        "api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
+        "signals_api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
+        "history_api_endpoint": "https://graphql-apis.equeum.com/tickers/history",
         "enable_long": true,
         "enable_short": true
     },

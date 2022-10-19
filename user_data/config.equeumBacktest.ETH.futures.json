@@ -1,17 +1,18 @@
 {
-    "max_open_trades": 100,
+    "max_open_trades": 1,
     "stake_currency": "USDT",
-    "stake_amount": "unlimited",
+    "stake_amount": 100,
     "tradable_balance_ratio": 1,
     "fiat_display_currency": "USD",
     "timeframe": "1m",
     "dry_run": true,
-    "dry_run_wallet": 10000,
+    "dry_run_wallet": 1000,
     "amend_last_stake_amount": true,
     "cancel_open_orders_on_exit": false,
     "use_exit_signal": true,
     "custom_price_max_distance_ratio": 1,
-    "trading_mode": "spot",
+    "trading_mode": "futures",
+    "margin_mode": "isolated",
     "unfilledtimeout": {
         "entry": 10,
         "exit": 10,
@@ -19,8 +20,8 @@
         "unit": "minutes"
     },
     "order_types": {
-        "entry": "limit",
-        "exit": "limit",
+        "entry": "market",
+        "exit": "market",
         "emergency_exit": "market",
         "force_exit": "market",
         "force_entry": "market",
@@ -56,37 +57,7 @@
             "rateLimit": 200
         },
         "pair_whitelist": [
-            "AAVE/USDT",
-            "ADA/USDT",
-            "ALCX/USDT",
-            "ALPHA/USDT",
-            "AUDIO/USDT",
-            "AUTO/USDT",
-            "AVAX/USDT",
-            "BLZ/USDT",
-            "BNB/USDT",
-            "BNBUP/USDT",
-            "BTC/USDT",
-            "CHZ/USDT",
-            "CLV/USDT",
-            "COMP/USDT",
-            "DOGE/USDT",
-            "EOS/USDT",
-            "ETH/USDT",
-            "FIL/USDT",
-            "HOT/USDT",
-            "ICP/USDT",
-            "KP3R/USDT",
-            "LINK/USDT",
-            "LINKUP/USDT",
-            "RAY/USDT",
-            "REQ/USDT",
-            "SHIB/USDT",
-            "SOL/USDT",
-            "UNI/USDT",
-            "VET/USDT",
-            "XRP/USDT",
-            "XTZ/USDT"
+            "ETH/USDT"
         ]
     },
     "pairlists": [
@@ -103,15 +74,46 @@
         "enable_short": true
     },
 
+    "telegram": {
+        "enabled": false,
+        "token": "5432602504:AAG-hQ76czggGftEtYVGzMsf87fgpV6Oga0",
+        "chat_id": "-757851014",
+        "notification_settings": {
+            "status": "silent",
+            "warning": "on",
+            "startup": "silent",
+            "entry": "silent",
+            "exit": {
+                "roi": "silent",
+                "emergency_exit": "on",
+                "force_exit": "on",
+                "exit_signal": "silent",
+                "trailing_stop_loss": "on",
+                "stop_loss": "on",
+                "stoploss_on_exchange": "on",
+                "custom_exit": "silent",
+                "partial_exit": "on"
+            },
+            "entry_cancel": "silent",
+            "exit_cancel": "on",
+            "entry_fill": "off",
+            "exit_fill": "off",
+            "protection_trigger": "off",
+            "protection_trigger_global": "on",
+            "strategy_msg": "off",
+            "show_candle": "off"
+        }
+    },
+
     "api_server": {
         "enabled": true,
         "listen_ip_address": "0.0.0.0",
-        "listen_port": 8081,
+        "listen_port": 8093,
         "verbosity": "error",
         "enable_openapi": false,
         "jwt_secret_key": "4db9e983c2027409abf11ae5e0e996cf444d5edaada20041a9c17034e9486f62",
         "ws_token": "JBOjTiA0Cc9M9yvWCGc9ohIXBvt6P49MiQ",
-        "CORS_origins": ["http://localhost:8080", "http://localhost:8081"],
+        "CORS_origins": ["http://localhost:8090", "http://localhost:8091"],
         "username": "freqtrader",
         "password": "123456"
     },

@@ -8,6 +8,7 @@ import requests
 import logging
 import numpy as np
 import pandas as pd
+from equeumBase import EqueumBaseStrategy
 
 from freqtrade.strategy import (IStrategy, informative)
 
@@ -16,8 +17,10 @@ from freqtrade.strategy import (IStrategy, informative)
 
 logger = logging.getLogger(__name__)
 
+# This class is a sample. Feel free to customize it.
 
-class EqueumBaseStrategy(IStrategy):
+
+class EqueumBacktestStrategy(EqueumBaseStrategy):
     INTERFACE_VERSION = 3
 
     # disable ROI
@@ -33,123 +36,107 @@ class EqueumBaseStrategy(IStrategy):
     timeframe = '1m'
 
     # Run "populate_indicators()" only for new candle.
-    process_only_new_candles = True
+    process_only_new_candles = False
 
     use_exit_signal = True
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
 
-    equeum_data = {}
-
     equem_ticker_map = {
         "1000SHIB": "SHIB"
     }
 
-    def bot_start(self):
-        # Can this strategy go short?
-        self.can_short = self.config['equeum']['enable_short']
-
-        # load backtest history data
-        if self.config['runmode'].value == 'backtest':
-            self.equeum_load_data()
-
-    def equeum_map_ticker(self, pair):
-        ticker = pair.split('/')[0]
-        if ticker in self.equem_ticker_map:
-            return self.equem_ticker_map[ticker]
-
-        return ticker
-
-    def equeum_load_data(self):
-
-        for pair in self.config['exchange']['pair_whitelist']:
-            ticker = self.equeum_map_ticker(pair)
-            # request data to API
-            endpoint = "https://dev-graphql-apis.equeum.com/tickers/history"
-            params = {
-                "ticker": f"{ticker}",
-                "from": 1640984400,  # 1 jan 2022
-                "to": 1672520400,  # 1 jan 2023
-                "token": "WPyiKanyl-7l0w844qefb7W6OQ1sj3Q671YXMgj5GMT3t"
+    plot_config = {
+        "main_plot": {},
+        "subplots": {
+            "equeum": {
+                "equeum_trend": {
+                    "color": "#6ac554",
+                    "type": "line"
+                    },
+                "equeum_value": {
+                    "color": "#911255",
+                    "type": "line"
+                    },
+                "equeum_trendline": {
+                    "color": "#e8525e",
+                    "type": "line"
+                    },
+                "equeum_h": {
+                    "color": "#333333",
+                    "type": "line"
+                    },
+                "equeum_l": {
+                    "color": "#333333",
+                    "type": "line"
+                    }
+                }
+        }
+    }
+    
+    @property
+    def protections(self):
+        return [
+            {
+                "method": "CooldownPeriod",
+                "stop_duration_candles": 0
             }
-            logger.info(
-                f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
+        ]
 
-            res = requests.get(endpoint, params)
-            eq_data = res.json()
+    def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
+        logger.info('----------------------------------')
+        logger.info('1. populate_indicators')
 
-            self.equeum_data[pair] = pd.DataFrame(data=eq_data)
+        # populate equeum data
+        df = self.populate_equeum_data(df, metadata['pair'])
 
-            logger.info(f"equeum: got response {self.equeum_data[pair].shape}")
-            logger.info(f"equeum: got response {self.equeum_data[pair].tail()}")
+        # transform trend value for visual enterpretation
+        df["equeum_trend"] = np.where(df["equeum_trendline"] == "up",
+                                      100, np.where(df["equeum_trendline"] == "down", -100, 0))
 
-    def equeum_map_trend(self, timestamp, pair):
-        try:
-            eqdf = self.equeum_data[pair]
-            # find forecast
-            forecast = eqdf[eqdf['time'] == timestamp]['forecast'].values[0]
+        df['equeum_h'] = 105
+        df['equeum_l'] = -105
 
-            # map values
-            if forecast > 0:
-                return 'up'
-            elif forecast < 0:
-                return 'down'
-        except:
-            return 'unknown'
+        logger.info(df.tail())
 
-
-    def populate_equeum_data(self, df: DataFrame, pair) -> DataFrame:
-        # timestamp 
-        df['timestamp'] = df['date'].map(lambda x: int(pd.Timestamp.timestamp(x)))
-        
-        if self.config['runmode'].value in ('live', 'dry_run'):
-            return self.populate_equeum_data_live(df, pair)
-        else:
-            return self.populate_equeum_data_backtest(df, pair)
-
-    def populate_equeum_data_backtest(self, df: DataFrame, ticker) -> DataFrame:
-        df["equeum_trendline"] = df['timestamp'].map(lambda x: self.equeum_map_trend(x, ticker))
         return df
 
-    def populate_equeum_data_live(self, df: DataFrame, pair) -> DataFrame:
-        # update ticker
-        ticker = self.equeum_map_ticker(pair)
+    def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        logger.info(f"2. populate_entry_trend, equeum={df['equeum_trendline'].iloc[-1]}")
+        df.loc[
+            (
+                (df['equeum_trendline'] == 'up') &
+                (self.config['equeum']['enable_long'])
+            ),
+            'enter_long'] = 1
 
-        # request data to API
-        params = {
-            "ticker": ticker,
-            "token": self.config['equeum']['api_token']
-        }
-        # logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
+        df.loc[
+            (
+                (df['equeum_trendline'] == 'down') &
+                (self.config['equeum']['enable_short'])
+            ),
+            'enter_short'] = 1
 
-        res = requests.get(self.config['equeum']['api_endpoint'], params)
-        eq_data = res.json()
+        logger.info(f'enter_long={df["enter_long"].iloc[-1]} / enter_short={df["enter_short"].iloc[-1]}')
 
-        # validate the response
-        if 'trendline' not in eq_data:
-            logger.warning('Provided equeum API is wrong! Please double check your config.')
-            # mock the response
-            df.at[df.index[-1], 'equeum_trendline'] = 'unknown'
-            df.at[df.index[-1], 'equeum_duration'] = ''
-            df.at[df.index[-1], 'equeum_value'] = 0
-            return df
+        return df
 
-        if not ticker in self.equeum_data:
-            self.equeum_data[ticker] = []
+    def populate_exit_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        logger.info(f"3. populate_exit_trend, equeum={df['equeum_trendline'].iloc[-1]}")
+        df.loc[
+            (
+                (df['equeum_trendline'] == 'down')
+            ),
 
-        # store it localy in memory
-        self.equeum_data[ticker].append(eq_data)
+            'exit_long'] = 1
 
-        # logger.info(f"equeum: response: {eq_data}")
-
-        # store only last 999 or less data points, since dataframe is always 999 candles
-        self.equeum_data[ticker] = self.equeum_data[ticker][-df.shape[0]:]
-
-        # merge equeum data into dataframe
-        for index, item in enumerate(reversed(self.equeum_data[ticker])):
-            df.at[df.index[-(index + 1)], 'equeum_trendline'] = item['trendline']
-            df.at[df.index[-(index + 1)], 'equeum_duration'] = item['duration']
-            df.at[df.index[-(index + 1)], 'equeum_value'] = item['value']
+        df.loc[
+            (
+                (df['equeum_trendline'] == 'up')
+            ),
+            'exit_short'] = 1
+        
+        logger.info(f'exit_long={df["exit_long"].iloc[-1]} / exit_short={df["exit_short"].iloc[-1]}')
 
         return df

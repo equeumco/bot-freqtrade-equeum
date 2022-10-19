@@ -159,3 +159,49 @@ And finally modify entry/exit signals based on equeum data:
 
         return df
 ```
+
+# How to run backtest
+
+## Make sure you donwloaded data for your coins:
+```sh
+freqtrade download-data \
+	--pairs-file pairs.json \
+	--days 250 \
+	--exchange binance \
+	-t 1m \
+	--trading-mode futures \
+	--userdir user_data
+```
+
+## Run backtest for single token
+```
+freqtrade backtesting \
+    -p ETH/USDT \
+	--max-open-trades 1 \
+	--stake-amount 1000 \
+	--fee 0 \
+	--timerange=20220301-20221008 \
+	--config user_data/configs/config.equeumBacktest.futures.json \
+	--strategy EqueumBacktestStrategy \
+	--strategy-path user_data/strategies
+```
+
+## Run backtest for multiple tokens
+```
+freqtrade backtesting \
+	--timerange=20220301-20221008 \
+	--config user_data/configs/config.equeumBacktest.futures.json \
+	--strategy EqueumBacktestStrategy \
+	--strategy-path user_data/strategies
+```
+
+### Official Octoberfest Command:
+```
+ freqtrade backtesting -p ETH/USDT \
+        --fee 0 \
+        --cache none \                                                         
+        --timerange=20220930- \
+        --config user_data/configs/config.equeumBacktest.ETH.futures.json \
+        --strategy EqueumBacktestStrategy \
+        --strategy-path user_data/strategies
+```
