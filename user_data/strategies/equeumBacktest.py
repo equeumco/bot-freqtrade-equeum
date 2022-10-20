@@ -8,10 +8,9 @@ import requests
 import logging
 import numpy as np
 import pandas as pd
+from equeumBase import EqueumBaseStrategy
 
 from freqtrade.strategy import (IStrategy, informative)
-
-from equeumBase import EqueumBaseStrategy
 
 # --------------------------------
 # Add your lib to import here
@@ -28,7 +27,7 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
     minimal_roi = {
         "0": 100
     }
-    
+
     # disable stop loss
     stoploss = -1
     trailing_stop = False
@@ -37,13 +36,17 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
     timeframe = '1m'
 
     # Run "populate_indicators()" only for new candle.
-    process_only_new_candles = True
+    process_only_new_candles = False
 
     use_exit_signal = True
-    
+
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
-    
+
+    equem_ticker_map = {
+        "1000SHIB": "SHIB"
+    }
+
     plot_config = {
         "main_plot": {},
         "subplots": {
@@ -51,38 +54,56 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
                 "equeum_trend": {
                     "color": "#6ac554",
                     "type": "line"
-                },
+                    },
                 "equeum_value": {
                     "color": "#911255",
                     "type": "line"
-                },
+                    },
                 "equeum_trendline": {
                     "color": "#e8525e",
                     "type": "line"
+                    },
+                "equeum_h": {
+                    "color": "#333333",
+                    "type": "line"
+                    },
+                "equeum_l": {
+                    "color": "#333333",
+                    "type": "line"
+                    }
                 }
-            }
         }
     }
     
-    def bot_start(self):
-        # Can this strategy go short?
-        self.can_short = self.config['equeum']['enable_short']
-        
-        # load backttest history data
-        self.equeum_load_data()        
-            
+    @property
+    def protections(self):
+        return [
+            {
+                "method": "CooldownPeriod",
+                "stop_duration_candles": 0
+            }
+        ]
+
     def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
-        
+        logger.info('----------------------------------')
+        logger.info('1. populate_indicators')
+
         # populate equeum data
-        self.populate_equeum_data(df, metadata['pair'])
-        
+        df = self.populate_equeum_data(df, metadata['pair'])
+
         # transform trend value for visual enterpretation
         df["equeum_trend"] = np.where(df["equeum_trendline"] == "up",
-            100, np.where(df["equeum_trendline"] == "down", -100, 0))
-        
+                                      100, np.where(df["equeum_trendline"] == "down", -100, 0))
+
+        df['equeum_h'] = 105
+        df['equeum_l'] = -105
+
+        logger.info(df.tail())
+
         return df
 
     def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        logger.info(f"2. populate_entry_trend, equeum={df['equeum_trendline'].iloc[-1]}")
         df.loc[
             (
                 (df['equeum_trendline'] == 'up') &
@@ -97,9 +118,12 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
             ),
             'enter_short'] = 1
 
+        logger.info(f'enter_long={df["enter_long"].iloc[-1]} / enter_short={df["enter_short"].iloc[-1]}')
+
         return df
 
     def populate_exit_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
+        logger.info(f"3. populate_exit_trend, equeum={df['equeum_trendline'].iloc[-1]}")
         df.loc[
             (
                 (df['equeum_trendline'] == 'down')
@@ -112,5 +136,7 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
                 (df['equeum_trendline'] == 'up')
             ),
             'exit_short'] = 1
+        
+        logger.info(f'exit_long={df["exit_long"].iloc[-1]} / exit_short={df["exit_short"].iloc[-1]}')
 
         return df
