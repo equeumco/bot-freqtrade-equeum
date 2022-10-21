@@ -205,3 +205,29 @@ freqtrade backtesting \
         --strategy EqueumBacktestStrategy \
         --strategy-path user_data/strategies
 ```
+
+### Download data with Docker
+
+```
+docker compose -f docker-compose-futures.yml run freqtrade download-data \
+	-p ETH/USDT \
+	--days 365 \
+	--exchange binance \
+	-t 1m \
+	--trading-mode futures \
+	--userdir user_data
+```
+
+### Backtest with Docker
+
+```
+docker compose -f docker-compose-futures.yml run freqtrade backtesting \
+        --fee 0 \
+        --dry-run-wallet 1000 \
+        --stake-amount 100 \
+        --max-open-trades 1 \
+        --timerange=20220201- \
+        --strategy-path user_data/strategies \
+        --strategy EqueumBacktestStrategy \
+        --config user_data/config.equeumBacktest.ETH.futures.json
+```
