@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # This class is a sample. Feel free to customize it.
 
 
-class EqueumBacktestStrategy(EqueumBaseStrategy):
+class EqueumRealtimeStrategy(EqueumBaseStrategy):
     INTERFACE_VERSION = 3
 
     # disable ROI
@@ -36,7 +36,7 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
     timeframe = '1m'
 
     # Run "populate_indicators()" only for new candle.
-    process_only_new_candles = True
+    process_only_new_candles = False
 
     use_exit_signal = True
 
@@ -87,6 +87,11 @@ class EqueumBacktestStrategy(EqueumBaseStrategy):
     def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
         logger.info('----------------------------------')
         logger.info('1. populate_indicators')
+
+        # unlock pair
+        if self.is_pair_locked(metadata['pair']):
+            self.unlock_pair(metadata['pair'])
+            logger.info(f"populate_indicators: pair {metadata['pair']} is locked, unlocking")
 
         # populate equeum data
         df = self.populate_equeum_data(df, metadata['pair'])

@@ -51,10 +51,6 @@ class EqueumBaseStrategy(IStrategy):
         # Can this strategy go short?
         self.can_short = self.config['equeum']['enable_short']
 
-        # load backtest history data
-        if self.config['runmode'].value == 'backtest':
-            self.equeum_load_data()
-
     def equeum_map_ticker(self, pair):
         ticker = pair.split('/')[0]
         if ticker in self.equem_ticker_map:
@@ -62,7 +58,7 @@ class EqueumBaseStrategy(IStrategy):
 
         return ticker
 
-    def equeum_load_data(self):
+    def equeum_load_data(self, df: DataFrame):
 
         for pair in self.config['exchange']['pair_whitelist']:
             ticker = self.equeum_map_ticker(pair)
@@ -70,8 +66,8 @@ class EqueumBaseStrategy(IStrategy):
             endpoint = self.config['equeum']['history_api_endpoint']
             params = {
                 "ticker": f"{ticker}",
-                "from": 1640984400,  # 1 jan 2022
-                "to": 1672520400,  # 1 jan 2023
+                'from': pd.Timestamp(df.iloc[0]['date']).timestamp(),
+                'to': pd.Timestamp(df.iloc[-1]['date']).timestamp(),
                 "token": self.config['equeum']['api_token']
             }
             logger.info(
@@ -109,6 +105,10 @@ class EqueumBaseStrategy(IStrategy):
             return self.populate_equeum_data_backtest(df, pair)
 
     def populate_equeum_data_backtest(self, df: DataFrame, pair) -> DataFrame:
+        # load data
+        self.equeum_load_data(df)
+        
+        # get pair data
         history_data = self.equeum_data[pair]
 
         history_df = pd.DataFrame(data=history_data)
