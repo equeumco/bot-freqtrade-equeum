@@ -88,7 +88,7 @@ class EqueumStrategy(IStrategy):
         }
         # logger.info(f"equeum: requesting: {self.config['equeum']['api_endpoint']} with payload: {params}")
 
-        res = requests.get(self.config['equeum']['api_endpoint'], params)
+        res = requests.get(self.config['equeum']['signals_api_endpoint'], params)
         eq_data = res.json()
         
         # validate the response
