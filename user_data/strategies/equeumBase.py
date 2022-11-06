@@ -41,7 +41,7 @@ class EqueumBaseStrategy(IStrategy):
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
 
-    equem_ticker_map = {
+    equeum_ticker_map = {
         "1000SHIB": "SHIB",
     }
     
@@ -53,8 +53,8 @@ class EqueumBaseStrategy(IStrategy):
 
     def equeum_map_ticker(self, pair):
         ticker = pair.split('/')[0]
-        if ticker in self.equem_ticker_map:
-            return self.equem_ticker_map[ticker]
+        if ticker in self.equeum_ticker_map:
+            return self.equeum_ticker_map[ticker]
 
         return ticker
 
@@ -97,7 +97,6 @@ class EqueumBaseStrategy(IStrategy):
         except:
             return 'unknown'
 
-
     def populate_equeum_data(self, df: DataFrame, pair) -> DataFrame:        
         if self.config['runmode'].value in ('live', 'dry_run'):
             return self.populate_equeum_data_live(df, pair)
@@ -125,35 +124,24 @@ class EqueumBaseStrategy(IStrategy):
     def populate_equeum_data_live(self, df: DataFrame, pair) -> DataFrame:
         # update ticker
         ticker = self.equeum_map_ticker(pair)
-
+            
         # request data to API
         params = {
             "ticker": ticker,
             "token": self.config['equeum']['api_token']
         }
+        
         logger.info(f"equeum: requesting: {self.config['equeum']['signals_api_endpoint']} with payload: {params}")
 
         res = requests.get(self.config['equeum']['signals_api_endpoint'], params)
-        eq_data = res.json()
+        eq_response = res.json()
         
-        logger.info(f"equeum: response: {res.status_code} = {eq_data}")
+        logger.info(f"equeum: response: {res.status_code} = {eq_response}")
         
-        date = pd.to_datetime(datetime.strptime(eq_data['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")).tz_localize('utc')
-
-        if eq_data['trendline'] == 'up':
-            df.loc[
-                (
-                    (df['date'] >= date) &
-                    (df['volume'] > 0) 
-                ),
-                'equeum_trendline'] = 'up'
-        elif eq_data['trendline'] == 'down':
-            df.loc[
-                (
-                    (df['date'] >= date) &
-                    (df['volume'] > 0) 
-                ),
-                'equeum_trendline'] = 'down'
-
+        # get timestamp
+        date = pd.to_datetime(datetime.strptime(eq_response['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")).tz_localize('utc')
+        
+        # update dataframe
+        df.loc[(df['date'] >= date), 'equeum_trendline'] = eq_response['trendline']
 
         return df

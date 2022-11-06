@@ -1,6 +1,11 @@
 # freqtrade bot from Roman with love
 
 Freqtrade bot, utilizing equeum API.
+## Before you start
+
+- [⚡️ Sign Up to the Platform](https://equeum.com/)
+- [🎓 Read Platform Documentation](https://equeum.gitbook.io/docs/)
+- [💬 Join Our Discord Community](https://discord.gg/J7Dwh3xPVD)
 
 # Setting up the bot
 
@@ -231,3 +236,9 @@ docker compose -f docker-compose-futures.yml run freqtrade backtesting \
         --strategy EqueumBacktestStrategy \
         --config user_data/config.equeumBacktest.ETH.futures.json
 ```
+
+## Resources
+
+- [⚡️ Website](https://equeum.com/)
+- [🎓 Documentation](https://equeum.gitbook.io/docs/)
+- [💬 Discord community](https://discord.gg/J7Dwh3xPVD)
