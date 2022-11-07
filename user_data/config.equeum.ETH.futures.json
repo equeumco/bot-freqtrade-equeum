@@ -66,49 +66,10 @@
         }
     ],
 
-    "equeum": {
-        "api_token": "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2",
-        "signals_api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
-        "history_api_endpoint": "https://graphql-apis.equeum.com/tickers/history",
-        "enable_long": true,
-        "enable_short": true
-    },
-
-    "telegram": {
-        "enabled": false,
-        "token": "5432602504:AAG-hQ76czggGftEtYVGzMsf87fgpV6Oga0",
-        "chat_id": "-757851014",
-        "notification_settings": {
-            "status": "silent",
-            "warning": "on",
-            "startup": "silent",
-            "entry": "silent",
-            "exit": {
-                "roi": "silent",
-                "emergency_exit": "on",
-                "force_exit": "on",
-                "exit_signal": "silent",
-                "trailing_stop_loss": "on",
-                "stop_loss": "on",
-                "stoploss_on_exchange": "on",
-                "custom_exit": "silent",
-                "partial_exit": "on"
-            },
-            "entry_cancel": "silent",
-            "exit_cancel": "on",
-            "entry_fill": "off",
-            "exit_fill": "off",
-            "protection_trigger": "off",
-            "protection_trigger_global": "on",
-            "strategy_msg": "off",
-            "show_candle": "off"
-        }
-    },
-
     "api_server": {
         "enabled": true,
         "listen_ip_address": "0.0.0.0",
-        "listen_port": 8093,
+        "listen_port": 8080,
         "verbosity": "error",
         "enable_openapi": false,
         "jwt_secret_key": "4db9e983c2027409abf11ae5e0e996cf444d5edaada20041a9c17034e9486f62",

@@ -40,16 +40,16 @@ class EqueumBaseStrategy(IStrategy):
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
+    
+    equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
+    equeum_signals_api_endpoint = "https://graphql-apis.equeum.com/tickers/signals"
+    equeum_history_api_endpoint = "https://graphql-apis.equeum.com/tickers/history"
 
     equeum_ticker_map = {
         "1000SHIB": "SHIB",
     }
     
     equeum_data = {}
-
-    def bot_start(self):
-        # Can this strategy go short?
-        self.can_short = self.config['equeum']['enable_short']
 
     def equeum_map_ticker(self, pair):
         ticker = pair.split('/')[0]
@@ -63,25 +63,26 @@ class EqueumBaseStrategy(IStrategy):
         for pair in self.config['exchange']['pair_whitelist']:
             ticker = self.equeum_map_ticker(pair)
             # request data to API
-            endpoint = self.config['equeum']['history_api_endpoint']
+            endpoint = self.equeum_history_api_endpoint
             params = {
                 "ticker": f"{ticker}",
                 'from': pd.Timestamp(df.iloc[0]['date']).timestamp(),
                 'to': pd.Timestamp(df.iloc[-1]['date']).timestamp(),
-                "token": self.config['equeum']['api_token']
+                "token": self.equeum_token
             }
-            logger.info(
-                f"equeum: requesting: {self.config['equeum']['history_api_endpoint']} with payload: {params}")
+            logger.info(f"equeum: requesting: {self.equeum_history_api_endpoint} with payload: {params}")
 
             res = requests.get(endpoint, params)
             eq_data = res.json()
+            
+            if ('status' in eq_data and eq_data['status'] == 'error'):
+                logger.error("Equeum Exception -> " + eq_data['error'])
             
             logger.info(f"equeum responses {res.status_code}")
 
             self.equeum_data[pair] = pd.DataFrame(data=eq_data)
 
-            # logger.info(f"equeum: got response {self.equeum_data[pair].shape}")
-            logger.info(f"equeum: got response {self.equeum_data[pair].tail()}")
+            logger.info(f"equeum: got response {self.equeum_data[pair].shape}")
 
     def equeum_map_trend(self, timestamp, pair):
         try:
@@ -97,7 +98,8 @@ class EqueumBaseStrategy(IStrategy):
         except:
             return 'unknown'
 
-    def populate_equeum_data(self, df: DataFrame, pair) -> DataFrame:        
+    def populate_equeum_data(self, df: DataFrame, pair) -> DataFrame:
+        # choose right environment
         if self.config['runmode'].value in ('live', 'dry_run'):
             return self.populate_equeum_data_live(df, pair)
         else:
@@ -128,15 +130,21 @@ class EqueumBaseStrategy(IStrategy):
         # request data to API
         params = {
             "ticker": ticker,
-            "token": self.config['equeum']['api_token']
+            "token": self.equeum_token
         }
         
-        logger.info(f"equeum: requesting: {self.config['equeum']['signals_api_endpoint']} with payload: {params}")
+        # logger.info(f"equeum: requesting: {self.config['equeum']['signals_api_endpoint']} with payload: {params}")
 
-        res = requests.get(self.config['equeum']['signals_api_endpoint'], params)
+        res = requests.get(self.equeum_signals_api_endpoint, params)
         eq_response = res.json()
         
-        logger.info(f"equeum: response: {res.status_code} = {eq_response}")
+        # logger.info(f"equeum: response: {res.status_code} = {eq_response}")
+        
+        # validate response
+        if ('status' in eq_response and eq_response['status'] == 'error'):
+            logger.error("Equeum Exception -> " + eq_response['error'])
+            df['equeum_trendline'] = 'unknown'
+            return df
         
         # get timestamp
         date = pd.to_datetime(datetime.strptime(eq_response['timestamp'], "%Y-%m-%dT%H:%M:%S.%fZ")).tz_localize('utc')

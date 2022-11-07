@@ -1,11 +1,22 @@
-# freqtrade bot from Roman with love
+# Equeum freqtrade bot template
 
-Freqtrade bot, utilizing equeum API.
+This is template strategy from which you can create your own freqtrade bot and start using Equeum forecasts.
 ## Before you start
 
 - [⚡️ Sign Up to the Platform](https://equeum.com/)
 - [🎓 Read Platform Documentation](https://equeum.gitbook.io/docs/)
 - [💬 Join Our Discord Community](https://discord.gg/J7Dwh3xPVD)
+
+## About Equeum
+[Equeum](https://equeum.com/) is a platform founded on the same principles as those of Wall Street quant funds: the fundamental truth being that prices of assets do not move at random, and that by gathering and analyzing vast amounts of data, developers can extract data-based signals for use in building quantitative pricing models. In short, Equeum is all about doing an open, large-scale version of what Wall Street quant firms have been doing for decades.
+
+[Equeum](https://equeum.com/) has, in essence, built a creator economy for quants. Any developer can use the platform for free.  Developers retain ownership, and are fairly compensated for what they create. The models they create are provided to investors to help investors make better, more informed, data-driven investment decisions. These investors pay for this value, and the majority of the revenue generated flows back to developers.
+
+[Equeum](https://equeum.com/) platform features:
+- A powerful time-series engine for analyzing and extracting signals from massive and diverse sets of data
+- A domain-specific language, EQL, that enables developers – collaboratively, iteratively, and in real-time – to create asset price models
+- Seamless integration of on- and off-platform data
+- A built-in set of shared tools to facilitate data collection and analysis
 
 # Setting up the bot
 
@@ -13,7 +24,7 @@ By default the bot in this repository is configured to run in the [dry mode](htt
 
 To switch to production mode, please carefully read [this part of documentation](https://www.freqtrade.io/en/stable/configuration/#switch-to-production-mode) and setup exchange and tokens you want to trade.
 
-Also don't forget to put the right `API Token` from [eqeueum app](https://app.equeum.com/app) to the configuration file at section `eqeueum.api_token`.
+Also don't forget to put the right `API Token` from [eqeueum app](https://app.equeum.com/app) to the variable `equeum_token` in the Strategy File.
 
 
 
@@ -23,9 +34,8 @@ Also don't forget to put the right `API Token` from [eqeueum app](https://app.eq
 2. Open Shell/terminal/cmd and `cd` to repo folder
 3. Download docker images with command  `docker compose -f docker-compose-futures.yml pull`
 4. Run the image with command (one of these, of your choice):
-	- `docker compose -f docker-compose-futures.yml up -d` - to run futures setup
+	- `docker compose up -d` - to run futures setup
 	- `docker compose -f docker-compose-spot.yml up -d` - to run spot setup
-	- `docker compose -f docker-compose-benchmark.yml up -d` - to run both futures and spot together
 
 Thats all. Now the bot is running and you can [access it](#how-to-access-the-bot).
 
@@ -35,7 +45,7 @@ If you want to run the bot on your host machine, follow installation guide for [
 
 Then merge the `user_data` folder from this repository into the folder, you've created during the installation.
 
-To start the bot on futures, run this in terminal:
+To start the bot on futures, run this command in your terminal:
 ```sh
 freqtrade trade
     --logfile /freqtrade/user_data/logs/freqtrade.futures.log \
@@ -55,166 +65,23 @@ freqtrade trade
 
 # How to access the bot:
 
-By default spot & futures bots are running on different ports:
-- futures - http://localhost:8080
-- spot - http://localhost:8081
+Open page http://localhost:8080, press `Login` button and enter `freqtrader` as login and `123456` as a password.
 
-To benchmark, you can access any of them and configure both bots in one UI.
 It is strongly recommended that you read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
 
 # How to add equium to existing strategy:
 
-Add this into your configuration file:
-```json
+We provide base strategy file, which contains all needed methods to populate equeum data both in live and backtesting modes.
 
-    "equeum": {
-        "api_token": "PUT YOUR TOKEN HERE",
-        "api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
-        "enable_long": true,
-        "enable_short": true
-    },
-```
-
-And this to your stategy file:
-
+To add these capabilities to your existing strategy, just copy file `EqueumBase.py` into your strategy folder and inherit your strategy from it:
 ```py
-	equeum_data = {}
-    
-    equem_ticker_map = {
-        "1000SHIB": "SHIB"
-    }
-	
-    def map_equeum_ticker(self, ft_ticker):
-        if ft_ticker in self.equem_ticker_map:
-            return self.equem_ticker_map[ft_ticker]
-        
-        return ft_ticker
-	
-	def populate_equeum_data(self, df: DataFrame, ticker) -> DataFrame:
-        # update ticker
-        ticker = self.map_equeum_ticker(ticker)
-        
-        # request data to API
-        params = {
-            "ticker": ticker,
-            "token": self.config['equeum']['api_token']
-        }
-        
-        res = requests.get(self.config['equeum']['api_endpoint'], params)
-        eq_data = res.json()
-        
-        if not ticker in self.equeum_data:
-            self.equeum_data[ticker] = []
-        
-        # store it localy in memory
-        self.equeum_data[ticker].append(eq_data)
-        
-        # store only last 999 or less data points, since dataframe is always 999 candles
-        self.equeum_data[ticker] = self.equeum_data[ticker][-df.shape[0]:]
-        
-        # merge equeum data into dataframe
-        for index, item in enumerate(reversed(self.equeum_data[ticker])):
-            df.at[df.index[-(index+1)], 'equeum_trendline'] = item['trendline']
-            df.at[df.index[-(index+1)], 'equeum_duration'] = item['duration']
-            df.at[df.index[-(index+1)], 'equeum_value'] = item['value']
-            
-        return df
-
+class MyAwesomeStrategy(EqueumBaseStrategy):
 ```
 
-Now it's tome to update `populate_indicators`:
-
-```py
-self.populate_equeum_data(df, ticker)
-```
-
-And finally modify entry/exit signals based on equeum data:
-
-```py
-    def populate_entry_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
-        df.loc[
-            (
-                (df['equeum_trendline'] == 'up') &
-                (self.config['equeum']['enable_long'])
-            ),
-            'enter_long'] = 1
-
-        df.loc[
-            (
-                (df['equeum_trendline'] == 'down') &
-                (self.config['equeum']['enable_short'])
-            ),
-            'enter_short'] = 1
-
-        return df
-
-    def populate_exit_trend(self, df: DataFrame, metadata: dict) -> DataFrame:
-        df.loc[
-            (
-                (df['equeum_trendline'] == 'down')
-            ),
-
-            'exit_long'] = 1
-
-        df.loc[
-            (
-                (df['equeum_trendline'] == 'up')
-            ),
-            'exit_short'] = 1
-
-        return df
-```
-
-# How to run backtest
-
-## Make sure you donwloaded data for your coins:
-```sh
-freqtrade download-data \
-	--pairs-file pairs.json \
-	--days 250 \
-	--exchange binance \
-	-t 1m \
-	--trading-mode futures \
-	--userdir user_data
-```
-
-## Run backtest for single token
-```
-freqtrade backtesting \
-    -p ETH/USDT \
-	--max-open-trades 1 \
-	--stake-amount 1000 \
-	--fee 0 \
-	--timerange=20220301-20221008 \
-	--config user_data/configs/config.equeumBacktest.futures.json \
-	--strategy EqueumBacktestStrategy \
-	--strategy-path user_data/strategies
-```
-
-## Run backtest for multiple tokens
-```
-freqtrade backtesting \
-	--timerange=20220301-20221008 \
-	--config user_data/configs/config.equeumBacktest.futures.json \
-	--strategy EqueumBacktestStrategy \
-	--strategy-path user_data/strategies
-```
-
-### Official Octoberfest Command:
-```
- freqtrade backtesting -p ETH/USDT \
-        --fee 0 \
-        --cache none \                                                         
-        --timerange=20220930- \
-        --config user_data/configs/config.equeumBacktest.ETH.futures.json \
-        --strategy EqueumBacktestStrategy \
-        --strategy-path user_data/strategies
-```
-
-### Download data with Docker
+### How to download data with Docker for signle coin:
 
 ```
-docker compose -f docker-compose-futures.yml run freqtrade download-data \
+docker compose run freqtrade download-data \
 	-p ETH/USDT \
 	--days 365 \
 	--exchange binance \
@@ -223,25 +90,35 @@ docker compose -f docker-compose-futures.yml run freqtrade download-data \
 	--userdir user_data
 ```
 
-### Backtest with Docker
+## How to download data with Docker for all equeum tradable coins:
+```sh
+docker compose run freqtrade download-data \
+	--pairs-file pairs.json \
+	--days 250 \
+	--exchange binance \
+	-t 1m \
+	--trading-mode futures \
+	--userdir user_data
+```
+
+### How to backtest with Docker
 
 ```
-docker compose -f docker-compose-futures.yml run freqtrade backtesting \
-        --fee 0 \
-        --dry-run-wallet 1000 \
-        --stake-amount 100 \
-        --max-open-trades 1 \
+docker compose run freqtrade backtesting \
         --timerange=20220201- \
         --strategy-path user_data/strategies \
-        --strategy EqueumBacktestStrategy \
-        --config user_data/config.equeumBacktest.ETH.futures.json
+        --config user_data/config.equeum.ETH.futures.json \
+        --strategy EqueumStrategy
 ```
-<<<<<<< HEAD
+
+## Questions?
+
+Join our [Discord community](https://discord.gg/J7Dwh3xPVD) to get fresh news, ask for help and find new strategy ideas.
 
 ## Resources
 
 - [⚡️ Website](https://equeum.com/)
 - [🎓 Documentation](https://equeum.gitbook.io/docs/)
 - [💬 Discord community](https://discord.gg/J7Dwh3xPVD)
-=======
->>>>>>> 1743150d9ebe5d5df01a77a8c76d3baa3bdb9148
+- [🤖 Jesse Trade strategy](https://github.com/equeumco/bot-jesse-equeum)
+- [🤖 Freqtrade strategy](https://github.com/equeumco/bot-freqtrade-equeum)

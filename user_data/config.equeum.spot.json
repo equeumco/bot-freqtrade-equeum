@@ -95,18 +95,10 @@
         }
     ],
 
-    "equeum": {
-        "api_token": "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2",
-        "signals_api_endpoint": "https://graphql-apis.equeum.com/tickers/signals",
-        "history_api_endpoint": "https://graphql-apis.equeum.com/tickers/history",
-        "enable_long": true,
-        "enable_short": true
-    },
-
     "api_server": {
         "enabled": true,
         "listen_ip_address": "0.0.0.0",
-        "listen_port": 8081,
+        "listen_port": 8080,
         "verbosity": "error",
         "enable_openapi": false,
         "jwt_secret_key": "4db9e983c2027409abf11ae5e0e996cf444d5edaada20041a9c17034e9486f62",

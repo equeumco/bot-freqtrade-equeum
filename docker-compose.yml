@@ -11,7 +11,7 @@ services:
     #   context: .
     #   dockerfile: "./docker/Dockerfile.custom"
     restart: unless-stopped
-    container_name: freqtrade_futures
+    container_name: freqtrade_equeum
     volumes:
       - "./user_data:/freqtrade/user_data"
     # Expose api on port 8080 (localhost only)
@@ -24,5 +24,5 @@ services:
       trade
       --logfile /freqtrade/user_data/logs/freqtrade.futures.log
       --db-url sqlite:////freqtrade/user_data/db/equeum.futures.dry.sqlite
-      --config /freqtrade/user_data/config.equeumBacktest.ETH.futures.json
+      --config /freqtrade/user_data/config.equeum.futures.json
       --strategy EqueumRealtimeStrategy

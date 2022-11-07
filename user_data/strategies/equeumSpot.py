@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # This class is a sample. Feel free to customize it.
 
 
-class EqueumRealtimeStrategy(EqueumBaseStrategy):
+class EqueumSpotStrategy(EqueumBaseStrategy):
     INTERFACE_VERSION = 3
 
     # disable ROI
@@ -36,17 +36,17 @@ class EqueumRealtimeStrategy(EqueumBaseStrategy):
     timeframe = '1m'
 
     # Run "populate_indicators()" only for new candle.
-    process_only_new_candles = False
+    process_only_new_candles = True
 
     use_exit_signal = True
     
-    can_short = True
+    can_short = False
 
     # Number of candles the strategy requires before producing valid signals
     startup_candle_count: int = 0
     
     # EQUEUM CONFIGURATION
-    equeum_token = "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2"
+    equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
     
     def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
         # populate equeum data
