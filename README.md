@@ -9,9 +9,9 @@ Freqtrade bot, utilizing equeum API.
 
 # Setting up the bot
 
-Byt default this bot in the repository is configured to run in the [dry mode](https://www.freqtrade.io/en/stable/configuration/#considerations-for-dry-run) and trade all available pairs to demonstrate you capabilities of the data equeum provides.
+By default the bot in this repository is configured to run in the [dry mode](https://www.freqtrade.io/en/stable/configuration/#considerations-for-dry-run) and trade all available pairs to demonstrate to you the capabilities of the data Equeum provides.
 
-To switch to production mode please carefully read [this part of documentation](https://www.freqtrade.io/en/stable/configuration/#switch-to-production-mode) and setup exchange and tokens you want to trade.
+To switch to production mode, please carefully read [this part of documentation](https://www.freqtrade.io/en/stable/configuration/#switch-to-production-mode) and setup exchange and tokens you want to trade.
 
 Also don't forget to put the right `API Token` from [eqeueum app](https://app.equeum.com/app) to the configuration file at section `eqeueum.api_token`.
 
@@ -27,15 +27,15 @@ Also don't forget to put the right `API Token` from [eqeueum app](https://app.eq
 	- `docker compose -f docker-compose-spot.yml up -d` - to run spot setup
 	- `docker compose -f docker-compose-benchmark.yml up -d` - to run both futures and spot together
 
-Thats all all, now the bot is running and you can [access it](#how-to-access-the-bot).
+Thats all. Now the bot is running and you can [access it](#how-to-access-the-bot).
 
 # Running bot on host machine
 
-If you want to run the bot on your host machine, consider to follow installation guide for [*nix platforms](https://www.freqtrade.io/en/stable/installation/) and [windows](https://www.freqtrade.io/en/stable/windows_installation).
+If you want to run the bot on your host machine, follow installation guide for [*nix platforms](https://www.freqtrade.io/en/stable/installation/) and [windows](https://www.freqtrade.io/en/stable/windows_installation).
 
-Then merge the `user_data` folder from this repository into the folder, you've creted during the installation.
+Then merge the `user_data` folder from this repository into the folder, you've created during the installation.
 
-To start the bot on futures run this in terminal:
+To start the bot on futures, run this in terminal:
 ```sh
 freqtrade trade
     --logfile /freqtrade/user_data/logs/freqtrade.futures.log \
@@ -59,8 +59,8 @@ By default spot & futures bots are running on different ports:
 - futures - http://localhost:8080
 - spot - http://localhost:8081
 
-For benchmark you can access any of them and configure both bots in one UI.
-It is strongly recommended to read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
+To benchmark, you can access any of them and configure both bots in one UI.
+It is strongly recommended that you read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
 
 # How to add equium to existing strategy:
 
@@ -236,9 +236,12 @@ docker compose -f docker-compose-futures.yml run freqtrade backtesting \
         --strategy EqueumBacktestStrategy \
         --config user_data/config.equeumBacktest.ETH.futures.json
 ```
+<<<<<<< HEAD
 
 ## Resources
 
 - [⚡️ Website](https://equeum.com/)
 - [🎓 Documentation](https://equeum.gitbook.io/docs/)
 - [💬 Discord community](https://discord.gg/J7Dwh3xPVD)
+=======
+>>>>>>> 1743150d9ebe5d5df01a77a8c76d3baa3bdb9148
