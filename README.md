@@ -76,7 +76,7 @@ Open page http://localhost:8080, press `Login` button and enter `freqtrader` as 
 
 It is strongly recommended that you read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
 
-# How to add equium to existing strategy:
+# How to add equeum to existing strategy:
 
 We provide base strategy file, which contains all needed methods to populate equeum data both in live and backtesting modes.
 
