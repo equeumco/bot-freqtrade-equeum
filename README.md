@@ -39,6 +39,13 @@ Also don't forget to put the right `API Token` from [eqeueum app](https://app.eq
 
 Thats all. Now the bot is running and you can [access it](#how-to-access-the-bot).
 
+# Available demo strategies
+In the `user_data\strategies` folder you could find several demo strategies:
+- `equeumBase.py` - base strategy, which contains all equeum integration code
+- `equeum.py` - default strategy for Futures Trading
+- `equeumSpot.py` - strategy for Spot trading, basically it cannot short
+- `equeumRealtime.py` - strategy for futures trading, which updates trend signal every 10s. Make sure you'll not hit equeum rate limit!
+
 # Running bot on host machine
 
 If you want to run the bot on your host machine, follow installation guide for [*nix platforms](https://www.freqtrade.io/en/stable/installation/) and [windows](https://www.freqtrade.io/en/stable/windows_installation).
@@ -73,12 +80,14 @@ It is strongly recommended that you read documentation about [freqtrade user int
 
 We provide base strategy file, which contains all needed methods to populate equeum data both in live and backtesting modes.
 
-To add these capabilities to your existing strategy, just copy file `EqueumBase.py` into your strategy folder and inherit your strategy from it:
+To add these capabilities to your existing strategy, just copy file `EqueumBase.py` into your strategy folder and inherit your strategy from `EqueumBaseStrategy` class:
 ```py
 class MyAwesomeStrategy(EqueumBaseStrategy):
 ```
 
-### How to download data with Docker for signle coin:
+# Additinal commands
+
+## How to download data with Docker for single coin
 
 ```
 docker compose run freqtrade download-data \
@@ -90,7 +99,7 @@ docker compose run freqtrade download-data \
 	--userdir user_data
 ```
 
-## How to download data with Docker for all equeum tradable coins:
+## How to download data with Docker for all equeum tradable coins
 ```sh
 docker compose run freqtrade download-data \
 	--pairs-file pairs.json \
@@ -101,7 +110,7 @@ docker compose run freqtrade download-data \
 	--userdir user_data
 ```
 
-### How to backtest with Docker
+## How to backtest with Docker
 
 ```
 docker compose run freqtrade backtesting \
