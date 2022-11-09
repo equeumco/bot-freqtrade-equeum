@@ -28,7 +28,7 @@ Also don't forget to put the right `API Token` from [eqeueum app](https://app.eq
 
 
 
-# Running bot with Docker:
+# Running bot with Docker
 
 1. Make sure you have Docker installed and running (https://www.docker.com/)
 2. Open Shell/terminal/cmd and `cd` to repo folder
@@ -70,13 +70,13 @@ freqtrade trade
     --strategy EqueumStrategy
 ```
 
-# How to access the bot:
+# Accessing bot
 
 Open page http://localhost:8080, press `Login` button and enter `freqtrader` as login and `123456` as a password.
 
 It is strongly recommended that you read documentation about [freqtrade user interface](https://www.freqtrade.io/en/stable/rest-api/#frequi)
 
-# How to add equeum to existing strategy:
+# Adding Equeum forecast to existing strategy
 
 We provide base strategy file, which contains all needed methods to populate equeum data both in live and backtesting modes.
 
@@ -120,7 +120,7 @@ docker compose run freqtrade backtesting \
         --strategy EqueumStrategy
 ```
 
-## Questions?
+# Questions?
 
 Join our [Discord community](https://discord.gg/J7Dwh3xPVD) to get fresh news, ask for help and find new strategy ideas.
 
