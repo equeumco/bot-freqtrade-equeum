@@ -48,6 +48,15 @@ class EqueumStrategy(EqueumBaseStrategy):
     # EQUEUM CONFIGURATION
     equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
     
+    @property
+    def protections(self):
+        return  [
+            {
+                "method": "CooldownPeriod",
+                "stop_duration_candles": 0
+            }
+        ]
+    
     def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
         # populate equeum data
         df = self.populate_equeum_data(df, metadata['pair'])

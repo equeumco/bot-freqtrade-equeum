@@ -46,9 +46,21 @@ class EqueumRealtimeStrategy(EqueumBaseStrategy):
     startup_candle_count: int = 0
     
     # EQUEUM CONFIGURATION
-    equeum_token = "JdXBcfwE0DvlF0_sZWPZeNTBPMJmNLXDTODDMNwUI2Hz2"
+    equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
+    
+    @property
+    def protections(self):
+        return  [
+            {
+                "method": "CooldownPeriod",
+                "stop_duration_candles": 0
+            }
+        ]
     
     def populate_indicators(self, df: DataFrame, metadata: dict) -> DataFrame:
+        if self.is_pair_locked(metadata['pair']):
+            self.unlock_pair(metadata['pair'])
+        
         # populate equeum data
         df = self.populate_equeum_data(df, metadata['pair'])
 
