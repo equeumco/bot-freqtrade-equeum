@@ -44,6 +44,8 @@ In the `user_data\strategies` folder you could find several demo strategies:
 - `equeumBase.py` - base strategy, which contains all equeum integration code
 - `equeum.py` - default strategy for Futures Trading
 - `equeumSpot.py` - strategy for Spot trading, basically it cannot short
+- `equeumHyperOpt.py` - copy of base strategy with extended ROI space for hyperoptimisation. 
+- `equeumAdvanced.py` - advanced strategy, demonstrating how to combine TA and Equeum Forecast.
 - `equeumRealtime.py` - strategy for futures trading, which updates trend signal every 10s. Make sure you'll not hit equeum rate limit!
 
 # Running bot on host machine
