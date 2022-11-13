@@ -85,6 +85,41 @@ To add these capabilities to your existing strategy, just copy file `EqueumBase.
 class MyAwesomeStrategy(EqueumBaseStrategy):
 ```
 
+# Hyperopt
+Any provided Equeum strategy could be easily Hyperopt'ed, e.g.:
+```
+docker compose run freqtrade hyperopt \
+	--timeframe 5m \
+	--timerange=20220201- \
+	--strategy-path user_data/strategies \
+	--config /freqtrade/user_data/config.equeum.ETH.futures.json \
+	--strategy EqueumStrategy \
+	-e 1000 \
+	-j -1 \
+	--hyperopt-loss SharpeHyperOptLoss \
+	--spaces roi stoploss
+```
+
+However in average Equeum forecast signal usuly lasts about 1.5 days, which is much wider then default ROI space, so we provide an extended example at file `equeumHyperOpt.py`.
+
+# Advanced Strategies
+
+It is possible to use Equeum forecast with combination with any TA indicators. Have a look at `equeumAdvanced.py`, which uses MA crossover with Equeum forecast. Before you begin, try hyperopt the strategy:
+```
+docker compose run freqtrade hyperopt \
+	--timerange=20220901- \
+	--strategy-path user_data/strategies \
+	--config /freqtrade/user_data/config.equeumAdvanced.futures.json \
+	--strategy EqueumAdvancedStrategy \
+	-e 100 \
+	-j -1 \
+	--hyperopt-loss SharpeHyperOptLoss \
+	--spaces roi buy
+```
+
+Then run it with: `docker compose -f docker-compose-advanced.yml up -d`
+
+
 # Additinal commands
 
 ## How to download data with Docker for single coin
@@ -94,7 +129,7 @@ docker compose run freqtrade download-data \
 	-p ETH/USDT \
 	--days 365 \
 	--exchange binance \
-	-t 1m \
+	-t 1m 5m \
 	--trading-mode futures \
 	--userdir user_data
 ```
@@ -118,6 +153,20 @@ docker compose run freqtrade backtesting \
         --strategy-path user_data/strategies \
         --config user_data/config.equeum.ETH.futures.json \
         --strategy EqueumStrategy
+```
+
+## How to run hyperoptimisation for strategy
+
+```
+docker compose run freqtrade hyperopt \
+	--timerange=20220901- \
+	--strategy-path user_data/strategies \
+	--config /freqtrade/user_data/config.equeumAdvanced.futures.json \
+	--strategy EqueumAdvancedStrategy \
+	-e 100 \
+	-j -1 \
+	--hyperopt-loss SortinoHyperOptLoss \
+	--spaces roi stoploss
 ```
 
 # Questions?

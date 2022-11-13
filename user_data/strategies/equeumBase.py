@@ -111,13 +111,16 @@ class EqueumBaseStrategy(IStrategy):
         
         # get pair data
         history_data = self.equeum_data[pair]
+        
+        logger.info(f'df shape before join {df.shape}')
 
         history_df = pd.DataFrame(data=history_data)
         history_df['date'] = pd.to_datetime(history_df['time'], unit='s', utc=True)
-        df = df.join(history_df.set_index('date'), on='date') # Join all history data to dataframe
+        df = df.join(history_df.set_index('date'), how="left", on='date') # Join all history data to dataframe
         
         df['equeum_trendline'] = np.where(df['forecast'] > 0, 'up', np.where(df['forecast'] < 0, 'down', 'unknown')) 
         
+        logger.info(f'df shape after join {df.shape}')
         # logger.info('df', df)
         # logger.info('equeum_trendline', df['equeum_trendline'])
         
