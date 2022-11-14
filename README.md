@@ -5,7 +5,7 @@ This is template strategy from which you can create your own freqtrade bot and s
 
 - [⚡️ Sign Up to the Platform](https://equeum.com/)
 - [🎓 Read Platform Documentation](https://equeum.gitbook.io/docs/)
-- [💬 Join Our Discord Community](https://discord.gg/J7Dwh3xPVD)
+- [💬 Join Our Discord Community](https://discord.gg/hTNWTsw9jN)
 
 ## About Equeum
 [Equeum](https://equeum.com/) is a platform founded on the same principles as those of Wall Street quant funds: the fundamental truth being that prices of assets do not move at random, and that by gathering and analyzing vast amounts of data, developers can extract data-based signals for use in building quantitative pricing models. In short, Equeum is all about doing an open, large-scale version of what Wall Street quant firms have been doing for decades.
@@ -173,12 +173,12 @@ docker compose run freqtrade hyperopt \
 
 # Questions?
 
-Join our [Discord community](https://discord.gg/J7Dwh3xPVD) to get fresh news, ask for help and find new strategy ideas.
+Join our [Discord community](https://discord.gg/hTNWTsw9jN) to get fresh news, ask for help and find new strategy ideas.
 
 ## Resources
 
 - [⚡️ Website](https://equeum.com/)
 - [🎓 Documentation](https://equeum.gitbook.io/docs/)
-- [💬 Discord community](https://discord.gg/J7Dwh3xPVD)
+- [💬 Discord community](https://discord.gg/hTNWTsw9jN)
 - [🤖 Jesse Trade strategy](https://github.com/equeumco/bot-jesse-equeum)
 - [🤖 Freqtrade strategy](https://github.com/equeumco/bot-freqtrade-equeum)
