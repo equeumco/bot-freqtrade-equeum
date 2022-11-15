@@ -32,7 +32,7 @@ Also don't forget to put the right `API Token` from [eqeueum app](https://app.eq
 
 1. Make sure you have Docker installed and running (https://www.docker.com/)
 2. Open Shell/terminal/cmd and `cd` to repo folder
-3. Download docker images with command  `docker compose -f docker-compose-futures.yml pull`
+3. Download docker images with command  `docker compose pull`
 4. Run the image with command (one of these, of your choice):
 	- `docker compose up -d` - to run futures setup
 	- `docker compose -f docker-compose-spot.yml up -d` - to run spot setup
