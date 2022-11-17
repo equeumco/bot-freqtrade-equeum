@@ -22,7 +22,7 @@ This is template strategy from which you can create your own freqtrade bot and s
 To setup the bot, simply run this command in your terminal console:
 ```
 # you can change "my-project" to any name you want
-git clone hhttps://github.com/equeumco/bot-freqtrade-equeum.git my-project
+git clone https://github.com/equeumco/bot-freqtrade-equeum.git my-project
 ```
 
 By default the bot in this repository is configured to run in the [dry mode](https://www.freqtrade.io/en/stable/configuration/#considerations-for-dry-run) and trade all available pairs to demonstrate to you the capabilities of the data Equeum provides.
