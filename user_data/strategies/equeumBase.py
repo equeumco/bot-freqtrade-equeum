@@ -43,7 +43,7 @@ class EqueumBaseStrategy(IStrategy):
     
     equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
     equeum_signals_api_endpoint = "https://graphql-apis.equeum.com/tickers/signals"
-    equeum_history_api_endpoint = "https://graphql-apis.equeum.com/tickers/history"
+    equeum_history_api_endpoint = "https://graphql-apis.equeum.com/resources/history"
 
     equeum_ticker_map = {
         "1000SHIB": "SHIB",
@@ -65,7 +65,7 @@ class EqueumBaseStrategy(IStrategy):
             # request data to API
             endpoint = self.equeum_history_api_endpoint
             params = {
-                "ticker": f"{ticker}",
+                "r": f"{ticker}",
                 'from': pd.Timestamp(df.iloc[0]['date']).timestamp(),
                 'to': pd.Timestamp(df.iloc[-1]['date']).timestamp(),
                 "token": self.equeum_token
@@ -77,10 +77,19 @@ class EqueumBaseStrategy(IStrategy):
             
             if ('status' in eq_data and eq_data['status'] == 'error'):
                 logger.error("Equeum Exception -> " + eq_data['error'])
+                
+            # convert API to dataframe
+            history_forecast = []
+            fields = eq_data['fields']
+            for r in eq_data['rows']:
+                history_forecast.append({
+                    "time": r['time'],
+                    f"{fields[0]}": r['values'][0],
+                    f"{fields[1]}": r['values'][1],
+                    f"{fields[2]}": r['values'][2]
+                })
             
-            logger.info(f"equeum responses {res.status_code}")
-
-            self.equeum_data[pair] = pd.DataFrame(data=eq_data)
+            self.equeum_data[pair] = pd.DataFrame(data=history_forecast)
 
             logger.info(f"equeum: got response {self.equeum_data[pair].shape}")
 
@@ -112,7 +121,7 @@ class EqueumBaseStrategy(IStrategy):
         # get pair data
         history_data = self.equeum_data[pair]
         
-        logger.info(f'df shape before join {df.shape}')
+        # logger.info(f'df shape before join {df.shape}')
 
         history_df = pd.DataFrame(data=history_data)
         history_df['date'] = pd.to_datetime(history_df['time'], unit='s', utc=True)
@@ -120,7 +129,7 @@ class EqueumBaseStrategy(IStrategy):
         
         df['equeum_trendline'] = np.where(df['forecast'] > 0, 'up', np.where(df['forecast'] < 0, 'down', 'unknown')) 
         
-        logger.info(f'df shape after join {df.shape}')
+        # logger.info(f'df shape after join {df.shape}')
         # logger.info('df', df)
         # logger.info('equeum_trendline', df['equeum_trendline'])
         
@@ -136,12 +145,12 @@ class EqueumBaseStrategy(IStrategy):
             "token": self.equeum_token
         }
         
-        # logger.info(f"equeum: requesting: {self.config['equeum']['signals_api_endpoint']} with payload: {params}")
+        logger.info(f"equeum: requesting: {self.equeum_signals_api_endpoint} with payload: {params}")
 
         res = requests.get(self.equeum_signals_api_endpoint, params)
         eq_response = res.json()
         
-        # logger.info(f"equeum: response: {res.status_code} = {eq_response}")
+        logger.info(f"equeum: response: {res.status_code} = {eq_response}")
         
         # validate response
         if ('status' in eq_response and eq_response['status'] == 'error'):
