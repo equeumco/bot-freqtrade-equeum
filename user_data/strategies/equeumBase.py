@@ -42,7 +42,7 @@ class EqueumBaseStrategy(IStrategy):
     startup_candle_count: int = 0
     
     equeum_token = "GET YOUR TOKEN AT HTTPS://APP.EQUEUM.COM"
-    equeum_signals_api_endpoint = "https://dev-graphql-apis.equeum.com/resources/signals"
+    equeum_signals_api_endpoint = "https://graphql-apis.equeum.com/resources/signals"
 
     equeum_ticker_map = {
         "1000SHIB": "SHIB",
